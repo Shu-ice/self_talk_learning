@@ -1,0 +1,999 @@
+/**
+ * ♿ Accessibility Styles
+ * 包括的アクセシビリティ・インクルーシブデザイン用スタイル
+ * WCAG 2.1 AAA準拠、多様なニーズに対応
+ */
+
+/* ==========================================================================
+   基本的なアクセシビリティスタイル
+   ========================================================================== */
+
+:root {
+  /* アクセシビリティ関連のカスタムプロパティ */
+  --accessibility-focus-color: #0066cc;
+  --accessibility-focus-width: 2px;
+  --accessibility-focus-style: solid;
+  --accessibility-focus-offset: 2px;
+  
+  /* 高コントラスト用色設定 */
+  --high-contrast-bg: #ffffff;
+  --high-contrast-text: #000000;
+  --high-contrast-link: #0000ff;
+  --high-contrast-visited: #800080;
+  --high-contrast-border: #000000;
+  
+  /* 拡大対応 */
+  --magnification: 1;
+  --font-size-base: 16px;
+  --line-height-base: 1.5;
+  --letter-spacing-base: 0;
+  --word-spacing-base: 0;
+  
+  /* タッチターゲットサイズ */
+  --touch-target-size: 44px;
+  --touch-target-spacing: 8px;
+  
+  /* アニメーション設定 */
+  --animation-duration: 0.3s;
+  --animation-easing: ease-in-out;
+  
+  /* 透明度設定 */
+  --transparency: 1;
+}
+
+/* ==========================================================================
+   フォーカス管理
+   ========================================================================== */
+
+/* デフォルトフォーカススタイル */
+:focus {
+  outline: var(--accessibility-focus-width) var(--accessibility-focus-style) var(--accessibility-focus-color);
+  outline-offset: var(--accessibility-focus-offset);
+}
+
+/* フォーカス表示強化 */
+.enhanced-focus :focus {
+  outline: 3px solid var(--accessibility-focus-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.3);
+}
+
+/* スキップリンク */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--accessibility-focus-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 1000;
+  font-weight: bold;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* フォーカストラップ */
+.focus-trap {
+  position: relative;
+}
+
+.focus-trap::before,
+.focus-trap::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   高コントラスト対応
+   ========================================================================== */
+
+.high-contrast {
+  background-color: var(--high-contrast-bg) !important;
+  color: var(--high-contrast-text) !important;
+}
+
+.high-contrast * {
+  background-color: var(--high-contrast-bg) !important;
+  color: var(--high-contrast-text) !important;
+  border-color: var(--high-contrast-border) !important;
+}
+
+.high-contrast a {
+  color: var(--high-contrast-link) !important;
+}
+
+.high-contrast a:visited {
+  color: var(--high-contrast-visited) !important;
+}
+
+.high-contrast button,
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  border: 2px solid var(--high-contrast-border) !important;
+}
+
+.high-contrast img {
+  filter: contrast(1.2) brightness(1.1);
+}
+
+/* ==========================================================================
+   色覚対応
+   ========================================================================== */
+
+/* 色覚異常対応フィルター */
+.color-blind-deuteranopia {
+  filter: url('#deuteranopia-filter');
+}
+
+.color-blind-protanopia {
+  filter: url('#protanopia-filter');
+}
+
+.color-blind-tritanopia {
+  filter: url('#tritanopia-filter');
+}
+
+.color-blind-achromatopsia {
+  filter: grayscale(100%);
+}
+
+/* 色に依存しない情報伝達 */
+.status-success::before {
+  content: '✓ ';
+  color: #00a000;
+}
+
+.status-error::before {
+  content: '✗ ';
+  color: #d00000;
+}
+
+.status-warning::before {
+  content: '⚠ ';
+  color: #ff8800;
+}
+
+.status-info::before {
+  content: 'ℹ ';
+  color: #0066cc;
+}
+
+/* ==========================================================================
+   フォント・文字サイズ対応
+   ========================================================================== */
+
+/* フォントサイズ調整 */
+.font-size-small {
+  font-size: 14px;
+}
+
+.font-size-medium {
+  font-size: 16px;
+}
+
+.font-size-large {
+  font-size: 20px;
+}
+
+.font-size-extra-large {
+  font-size: 24px;
+}
+
+/* ディスレクシア対応フォント */
+.font-family-dyslexia-friendly {
+  font-family: 'OpenDyslexic', 'Arial', sans-serif;
+}
+
+.font-family-sans-serif {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.font-family-serif {
+  font-family: 'Times New Roman', serif;
+}
+
+.font-family-monospace {
+  font-family: 'Courier New', monospace;
+}
+
+/* 行間・文字間隔調整 */
+.enhanced-readability {
+  line-height: var(--line-height-base);
+  letter-spacing: var(--letter-spacing-base);
+  word-spacing: var(--word-spacing-base);
+}
+
+/* ==========================================================================
+   ダークモード対応
+   ========================================================================== */
+
+.dark-mode {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #444444;
+  --link-color: #66b3ff;
+  --link-visited: #cc99ff;
+}
+
+.dark-mode body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.dark-mode .card,
+.dark-mode .panel {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-mode a {
+  color: var(--link-color);
+}
+
+.dark-mode a:visited {
+  color: var(--link-visited);
+}
+
+/* ==========================================================================
+   アニメーション・モーション対応
+   ========================================================================== */
+
+/* 通常のアニメーション */
+.animate {
+  transition: all var(--animation-duration) var(--animation-easing);
+}
+
+/* モーション軽減 */
+.reduced-motion,
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* アニメーション完全無効 */
+.no-animations,
+.no-animations * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ==========================================================================
+   タッチターゲット・クリック領域
+   ========================================================================== */
+
+/* 基本的なタッチターゲット */
+.touch-target {
+  min-height: var(--touch-target-size);
+  min-width: var(--touch-target-size);
+  padding: var(--touch-target-spacing);
+}
+
+/* ボタンサイズ調整 */
+.button-size-small {
+  min-height: 32px;
+  min-width: 32px;
+  padding: 4px 8px;
+}
+
+.button-size-medium {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+}
+
+.button-size-large {
+  min-height: 64px;
+  min-width: 64px;
+  padding: 16px 24px;
+}
+
+/* クリック補助 */
+.click-assist {
+  position: relative;
+}
+
+.click-assist::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  z-index: -1;
+}
+
+/* ==========================================================================
+   キーボードナビゲーション
+   ========================================================================== */
+
+/* キーボードナビゲーション表示 */
+.keyboard-navigation .focusable {
+  position: relative;
+}
+
+.keyboard-navigation .focusable:focus::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid var(--accessibility-focus-color);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* タブ順序の視覚化 */
+.show-tab-order .focusable:focus::before {
+  content: attr(tabindex);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: var(--accessibility-focus-color);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 12px;
+  z-index: 1000;
+}
+
+/* ==========================================================================
+   スクリーンリーダー対応
+   ========================================================================== */
+
+/* スクリーンリーダー専用コンテンツ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* フォーカス時に表示 */
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: initial;
+  margin: initial;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ライブリージョン */
+.live-region {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* スクリーンリーダー最適化 */
+.screen-reader-optimized {
+  /* 構造化された見出し */
+}
+
+.screen-reader-optimized h1,
+.screen-reader-optimized h2,
+.screen-reader-optimized h3,
+.screen-reader-optimized h4,
+.screen-reader-optimized h5,
+.screen-reader-optimized h6 {
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+/* ==========================================================================
+   認知サポート
+   ========================================================================== */
+
+/* 読書ガイド */
+.reading-guide {
+  position: relative;
+}
+
+.reading-guide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.5em;
+  background: rgba(255, 255, 0, 0.3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* フォーカスモード */
+.focus-mode {
+  filter: blur(0);
+}
+
+.focus-mode > *:not(:focus):not(:focus-within) {
+  filter: blur(2px);
+  opacity: 0.6;
+}
+
+/* 進捗表示 */
+.progress-always-visible {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.progress-always-visible::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--accessibility-focus-color);
+  width: var(--progress-percentage, 0%);
+  transition: width 0.3s ease;
+}
+
+/* メモリ補助 */
+.memory-aid {
+  position: relative;
+}
+
+.memory-aid::after {
+  content: attr(data-memory-aid);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.memory-aid:hover::after,
+.memory-aid:focus::after {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   レイアウト・インターフェース
+   ========================================================================== */
+
+/* レイアウト調整 */
+.layout-simplified {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.layout-simplified > * {
+  margin: 0;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.layout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* 情報密度調整 */
+.density-compact {
+  --spacing: 0.25rem;
+  --padding: 0.5rem;
+}
+
+.density-comfortable {
+  --spacing: 0.5rem;
+  --padding: 1rem;
+}
+
+.density-spacious {
+  --spacing: 1rem;
+  --padding: 1.5rem;
+}
+
+/* ==========================================================================
+   エラー・バリデーション
+   ========================================================================== */
+
+/* エラー表示 */
+.error {
+  border: 2px solid #d00000;
+  background-color: #ffe6e6;
+}
+
+.error-message {
+  color: #d00000;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
+
+.error-message::before {
+  content: '⚠ ';
+  font-weight: normal;
+}
+
+/* 必須フィールド */
+.required::after {
+  content: ' *';
+  color: #d00000;
+  font-weight: bold;
+}
+
+/* バリデーション成功 */
+.valid {
+  border: 2px solid #00a000;
+  background-color: #e6ffe6;
+}
+
+.valid::after {
+  content: '✓';
+  color: #00a000;
+  font-weight: bold;
+  margin-left: 0.25rem;
+}
+
+/* ==========================================================================
+   言語・国際化対応
+   ========================================================================== */
+
+/* 右から左へのテキスト */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl .skip-link {
+  left: auto;
+  right: 6px;
+}
+
+/* 多言語フォント */
+.multilingual {
+  font-family: 'Noto Sans', 'Arial Unicode MS', sans-serif;
+}
+
+/* ==========================================================================
+   緊急時アクセシビリティ
+   ========================================================================== */
+
+.emergency-mode {
+  /* 緊急時の基本設定 */
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  letter-spacing: 0.05em !important;
+  background: white !important;
+  color: black !important;
+}
+
+.emergency-mode * {
+  background: white !important;
+  color: black !important;
+  border-color: black !important;
+}
+
+.emergency-mode a {
+  color: blue !important;
+  text-decoration: underline !important;
+}
+
+.emergency-mode button {
+  background: black !important;
+  color: white !important;
+  border: 2px solid black !important;
+  font-size: 16px !important;
+  padding: 12px 24px !important;
+}
+
+/* ==========================================================================
+   プリント・印刷対応
+   ========================================================================== */
+
+@media print {
+  /* 印刷時のアクセシビリティ対応 */
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  /* リンクURL表示 */
+  a::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #666;
+  }
+  
+  /* 色を白黒に */
+  * {
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  
+  /* フォントサイズ調整 */
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  h1 { font-size: 18pt; }
+  h2 { font-size: 16pt; }
+  h3 { font-size: 14pt; }
+  h4 { font-size: 12pt; }
+  h5 { font-size: 11pt; }
+  h6 { font-size: 10pt; }
+}
+
+/* ==========================================================================
+   メディアクエリ・レスポンシブ
+   ========================================================================== */
+
+/* 大きな文字サイズ対応 */
+@media (min-resolution: 2dppx) {
+  .high-dpi {
+    font-size: calc(var(--font-size-base) * 1.1);
+  }
+}
+
+/* 狭い画面での調整 */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  .button-size-medium {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  .skip-link {
+    font-size: 16px;
+    padding: 12px;
+  }
+}
+
+/* 極端に狭い画面 */
+@media (max-width: 320px) {
+  .emergency-mode {
+    font-size: 16px !important;
+  }
+  
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* アクセシビリティ設定インターフェース */
+.accessibility-settings {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: white;
+  color: black;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.settings-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.settings-sidebar {
+  width: 250px;
+  background: #f5f5f5;
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background: #e0e0e0;
+}
+
+.nav-item.active {
+  background: #0066cc;
+  color: white;
+}
+
+.nav-icon {
+  margin-right: 0.5rem;
+}
+
+.settings-main {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.setting-control {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+}
+
+.setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.setting-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.setting-impact {
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.impact-high {
+  background: #ffcccc;
+  color: #800000;
+}
+
+.impact-medium {
+  background: #ffffcc;
+  color: #806600;
+}
+
+.impact-low {
+  background: #ccffcc;
+  color: #006600;
+}
+
+.setting-description {
+  margin: 0 0 1rem 0;
+  color: #666;
+}
+
+.setting-control-wrapper {
+  margin-bottom: 1rem;
+}
+
+.toggle-control {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-control input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 50px;
+  height: 24px;
+  background: #ccc;
+  border-radius: 24px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle-control input:checked + .toggle-slider {
+  background: #0066cc;
+}
+
+.toggle-control input:checked + .toggle-slider::after {
+  transform: translateX(26px);
+}
+
+.slider-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slider-control input {
+  flex: 1;
+}
+
+.slider-value {
+  font-weight: bold;
+  min-width: 60px;
+  text-align: right;
+}
+
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+.changes-indicator {
+  color: #ff8800;
+  font-weight: bold;
+}
+
+.test-mode-indicator {
+  color: #0066cc;
+  font-weight: bold;
+}
+
+.settings-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ダイアログ */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+/* ==========================================================================
+   ユーティリティクラス
+   ========================================================================== */
+
+/* 表示制御 */
+.show-for-screen-reader {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hide-for-screen-reader {
+  speak: none;
+}
+
+/* 拡大対応 */
+.scalable {
+  transform: scale(var(--magnification));
+  transform-origin: top left;
+}
+
+/* 高コントラスト検出 */
+@media (prefers-contrast: high) {
+  :root {
+    --accessibility-focus-color: #000000;
+    --accessibility-focus-width: 3px;
+  }
+}
+
+/* 色彩設定検出 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1a1a;
+    --text-primary: #ffffff;
+  }
+}
+
+/* モーション設定検出 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 透明度設定検出 */
+@media (prefers-reduced-transparency: reduce) {
+  * {
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+}

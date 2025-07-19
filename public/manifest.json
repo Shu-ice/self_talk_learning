@@ -1,0 +1,109 @@
+{
+  "name": "AIセルフトークラーニング - 中学受験準備",
+  "short_name": "AI学習コーチ",
+  "description": "AI搭載の個人最適化学習プラットフォーム。中学受験に向けた効果的な学習をサポートします。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ja",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "kids"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "今日の学習を開始",
+      "short_name": "学習開始",
+      "description": "本日の学習プランを開始します",
+      "url": "/study/today",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "進捗確認",
+      "short_name": "進捗",
+      "description": "学習進捗と分析を確認します",
+      "url": "/analytics",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "復習タイム",
+      "short_name": "復習",
+      "description": "今日の復習項目を確認します",
+      "url": "/review",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+
+  "features": [
+    "adaptive-learning",
+    "voice-input",
+    "handwriting-recognition", 
+    "offline-capable",
+    "cross-device-sync",
+    "background-sync",
+    "push-notifications",
+    "smart-scheduling"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+
+  "share_target": {
+    "action": "/share-target/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", ".pdf", ".doc", ".docx"]
+        }
+      ]
+    }
+  },
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.example.ailearning",
+      "id": "com.example.ailearning"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(timeout 8s npm run dev)",
+      "Bash(timeout 30s npm run dev)",
+      "Bash(sed:*)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(ls:*)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(timeout 15s npm run dev)",
+      "Bash(ss:*)",
+      "Bash(timeout 5s npm run dev)",
+      "Bash(touch:*)",
+      "Bash(find:*)",
+      "Bash(node:*)",
+      "Bash(rg:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint)",
+      "Bash(npx ts-node:*)",
+      "Bash(kill:*)",
+      "Bash(timeout:*)"
+    ],
+    "deny": []
+  }
+}
