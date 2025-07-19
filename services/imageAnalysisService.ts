@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ImageAnalysisResult, MessageAttachment } from '../types';
 import { DETAILED_SUBJECTS, findSubUnitsByKeyword } from '../data/detailedCurriculum';
 
@@ -93,7 +93,7 @@ export const analyzeImageWithGemini = async (
   }
 
   try {
-    const genAI = new GoogleGenAI(apiKey);
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // Base64データからMIMEタイプと純粋なBase64データを分離

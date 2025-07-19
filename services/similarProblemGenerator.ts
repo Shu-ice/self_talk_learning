@@ -44,7 +44,9 @@ export interface SimilarProblemSet {
 
 // APIキー取得
 const getApiKey = (): string => {
-  return process.env.GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+  return process.env.GEMINI_API_KEY || 
+         process.env.VITE_GEMINI_API_KEY || 
+         localStorage.getItem('GEMINI_API_KEY') || '';
 };
 
 // 類題生成のメイン関数
