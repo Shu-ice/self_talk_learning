@@ -16,7 +16,7 @@ import ParentDashboard from './components/ParentDashboard';
 import ApiKeySetup from './components/ApiKeySetup';
 import DebugPanel from './components/DebugPanel';
 import { Subject, Topic, ChatMessage, UserProgress, LearningSession, MessageAttachment, LearnerProfile } from './types';
-import { startChatSession, sendMessageToChat, validateApiKey } from './services/geminiService';
+import { startChatSession, startEnhancedChatSession, sendMessageToChat, validateApiKey } from './services/geminiService';
 import { 
   loadUserProgress, 
   createInitialUserProgress, 
@@ -106,31 +106,65 @@ const App: React.FC = () => {
       // セッション録画開始
       sessionRecorderService.startRecording(sessionId, subject.id, topic.id);
 
-      const session = await startChatSession();
-      setChatSession(session);
+      // 中学受験特化型チャットセッションを開始
+      let session: ChatSession;
+      let initialUserMessage: string;
 
-      // 弱点分析の結果を取得
-      const weaknessAnalysis = analyzeWeaknesses(subject.id, topic.id);
-      const currentTopicWeakness = weaknessAnalysis.find(w => w.topicId === topic.id);
+      if (learnerProfile) {
+        // 学習者プロフィールがある場合は、中学受験特化型システムを使用
+        console.log('🎓 中学受験特化型システムでチャットセッション開始', {
+          topic: topic.name,
+          subject: subject.name,
+          grade: learnerProfile.currentGrade,
+          schoolLevel: learnerProfile.schoolLevel
+        });
 
-      // AIプロンプトに難易度調整と弱点分析を追加
-      let enhancedPrompt = `「${subject.name}」の「${topic.name}」について学習を始めたいです。最初の問題を出してください。
+        session = await startEnhancedChatSession(topic.name, subject.id, learnerProfile);
+        setChatSession(session);
+
+        // 中学受験特化型システムでは、AIプロンプトは自動生成される
+        initialUserMessage = `「${topic.name}」について学習を始めたいです。最初の問題を出してください。`;
+
+        // 追加の学習要件があれば付加
+        const weaknessAnalysis = analyzeWeaknesses(subject.id, topic.id);
+        const currentTopicWeakness = weaknessAnalysis.find(w => w.topicId === topic.id);
+
+        if (currentTopicWeakness && currentTopicWeakness.focusAreas.length > 0) {
+          initialUserMessage += `
+
+特に以下の分野を重点的に扱ってください: ${currentTopicWeakness.focusAreas.join('、')}`;
+        }
+
+      } else {
+        // 従来システム（後方互換性）
+        console.log('🔄 従来システムでチャットセッション開始');
+        
+        session = await startChatSession();
+        setChatSession(session);
+
+        // 弱点分析の結果を取得
+        const weaknessAnalysis = analyzeWeaknesses(subject.id, topic.id);
+        const currentTopicWeakness = weaknessAnalysis.find(w => w.topicId === topic.id);
+
+        // AIプロンプトに難易度調整と弱点分析を追加
+        let enhancedPrompt = `「${subject.name}」の「${topic.name}」について学習を始めたいです。最初の問題を出してください。
 
 ${adaptiveLearning.promptModifier}`;
 
-      if (currentTopicWeakness && currentTopicWeakness.focusAreas.length > 0) {
-        enhancedPrompt += `
+        if (currentTopicWeakness && currentTopicWeakness.focusAreas.length > 0) {
+          enhancedPrompt += `
 
 特に以下の分野を重点的に扱ってください: ${currentTopicWeakness.focusAreas.join('、')}`;
-      }
+        }
 
-      if (adaptiveLearning.adjustment) {
-        enhancedPrompt += `
+        if (adaptiveLearning.adjustment) {
+          enhancedPrompt += `
 
 レベル調整: ${adaptiveLearning.adjustment.reason}`;
-      }
+        }
 
-      const initialUserMessage = enhancedPrompt;
+        initialUserMessage = enhancedPrompt;
+      }
       
       // Add a system message indicating the start of the session for UI
       const systemMessage: ChatMessage = {

@@ -5,6 +5,10 @@ import { SUBJECTS_DATA } from '../constants';
 import { KidsButton, KidsCard, StudyStartButton } from './ui/KidsUIComponents';
 import HierarchicalSubjectSelector from './HierarchicalSubjectSelector';
 import ImprovedHierarchicalSelector from './ImprovedHierarchicalSelector';
+import HierarchicalDropdownSelector from './HierarchicalDropdownSelector';
+import EnhancedHierarchicalDropdown from './EnhancedHierarchicalDropdown';
+import MiddleSchoolExamDropdown from './MiddleSchoolExamDropdown';
+import EliteSchoolExamDropdown from './EliteSchoolExamDropdown';
 import FavoriteTopics from './FavoriteTopics';
 import ProgressVisualization from './ProgressVisualization';
 
@@ -17,6 +21,8 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
   const [selectedSubjectId, setSelectedSubjectId] = React.useState<string>(SUBJECTS_DATA[0]?.id || '');
   const [selectedTopicId, setSelectedTopicId] = React.useState<string>(SUBJECTS_DATA[0]?.topics[0]?.id || '');
   const [showHierarchical, setShowHierarchical] = React.useState<boolean>(false);
+  const [showDropdownMode, setShowDropdownMode] = React.useState<boolean>(true);
+  const [showEliteMode, setShowEliteMode] = React.useState<boolean>(false);
   const [showFavorites, setShowFavorites] = React.useState<boolean>(true);
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
 
@@ -128,19 +134,52 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
               onClick={() => {
                 setShowFavorites(true);
                 setShowProgress(false);
+                setShowDropdownMode(true);
+                setShowEliteMode(false);
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                showFavorites && !showProgress
+                showFavorites && !showProgress && showDropdownMode && !showEliteMode
                   ? 'bg-blue-500 text-white shadow-md'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              📚 学習選択
+              🎓 標準受験
+            </button>
+            <button
+              onClick={() => {
+                setShowFavorites(true);
+                setShowProgress(false);
+                setShowDropdownMode(true);
+                setShowEliteMode(true);
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                showFavorites && !showProgress && showDropdownMode && showEliteMode
+                  ? 'bg-red-500 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              👑 最難関対応
+            </button>
+            <button
+              onClick={() => {
+                setShowFavorites(true);
+                setShowProgress(false);
+                setShowDropdownMode(false);
+                setShowEliteMode(false);
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                showFavorites && !showProgress && !showDropdownMode && !showEliteMode
+                  ? 'bg-purple-500 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              🎯 カード選択
             </button>
             <button
               onClick={() => {
                 setShowFavorites(false);
                 setShowProgress(true);
+                setShowEliteMode(false);
               }}
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 showProgress
@@ -162,16 +201,34 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
         />
       )}
 
+      {/* 標準中学受験対応ドロップダウン選択モード */}
+      {showFavorites && !showProgress && showDropdownMode && !showEliteMode && (
+        <MiddleSchoolExamDropdown
+          onStartLearning={onStartLearning}
+          disabled={disabled}
+          className="mb-6"
+        />
+      )}
+
+      {/* 最難関中学受験対応ドロップダウン選択モード */}
+      {showFavorites && !showProgress && showDropdownMode && showEliteMode && (
+        <EliteSchoolExamDropdown
+          onStartLearning={onStartLearning}
+          disabled={disabled}
+          className="mb-6"
+        />
+      )}
+
       {/* お気に入り・最近の学習 */}
-      {showFavorites && !showProgress && (
+      {showFavorites && !showProgress && !showDropdownMode && !showEliteMode && (
         <FavoriteTopics 
           onTopicSelect={handleFavoriteTopicSelect}
           className="mb-6"
         />
       )}
 
-      {/* 教科選択カード（学習選択モードのみ表示） */}
-      {showFavorites && !showProgress && (
+      {/* 教科選択カード（カード選択モードのみ表示） */}
+      {showFavorites && !showProgress && !showDropdownMode && !showEliteMode && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {SUBJECTS_DATA.map(subject => {
           const isSelected = selectedSubjectId === subject.id;
@@ -220,8 +277,8 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
         </div>
       )}
 
-      {/* 算数の場合は階層選択モード切り替えボタンを表示（学習選択モードのみ） */}
-      {showFavorites && !showProgress && selectedSubjectId === 'math' && (
+      {/* 算数の場合は階層選択モード切り替えボタンを表示（カード選択モードのみ） */}
+      {showFavorites && !showProgress && !showDropdownMode && !showEliteMode && selectedSubjectId === 'math' && (
         <div className="text-center">
           <div className="bg-yellow-100 border-2 border-yellow-300 rounded-xl p-6 mb-6">
             <div className="text-4xl mb-3">🎯</div>
@@ -246,8 +303,8 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
         </div>
       )}
 
-      {/* 単元選択（学習選択モードのみ） */}
-      {showFavorites && !showProgress && currentSubject && (
+      {/* 単元選択（カード選択モードのみ） */}
+      {showFavorites && !showProgress && !showDropdownMode && !showEliteMode && currentSubject && (
         <KidsCard title="単元を選ぼう" icon="📝" color="green" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {currentSubject.topics.map(topic => {
@@ -271,8 +328,8 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
         </KidsCard>
       )}
 
-      {/* 学習開始ボタン */}
-      {selectedSubjectId && selectedTopicId && currentSubject && selectedTopic && (
+      {/* 学習開始ボタン（カード選択モードのみ） */}
+      {showFavorites && !showProgress && !showDropdownMode && !showEliteMode && selectedSubjectId && selectedTopicId && currentSubject && selectedTopic && (
         <StudyStartButton
           subjectName={currentSubject.name}
           topicName={selectedTopic.name}
@@ -280,7 +337,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
           disabled={disabled}
           onStart={handleSubmit}
         />
-      )} {/* 学習選択モード終了 */}
+      )}
     </div>
   );
 };

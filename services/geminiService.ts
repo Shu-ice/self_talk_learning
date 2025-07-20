@@ -1,6 +1,7 @@
 
 import { GoogleGenerativeAI, ChatSession, GenerateContentResult } from "@google/generative-ai";
-import { AI_SYSTEM_PROMPT } from '../constants';
+import { AI_SYSTEM_PROMPT, generateEnhancedAIPrompt } from '../constants';
+import { LearnerProfile } from '../services/enhancedEducationSystem';
 
 // APIキーを環境変数から取得
 const API_KEY = process.env.GEMINI_API_KEY || 
@@ -55,6 +56,7 @@ try {
 
 const model = 'gemini-1.5-flash';
 
+// 基本チャットセッション（後方互換性用）
 export const startChatSession = async (): Promise<ChatSession> => {
   if (!genAI) {
     throw new Error(`APIキーエラー: ${apiKeyMessage}`);
@@ -75,6 +77,36 @@ export const startChatSession = async (): Promise<ChatSession> => {
   } catch (error) {
     console.error('❌ チャットセッション開始エラー:', error);
     throw new Error(`チャットセッションの開始に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
+  }
+};
+
+// 中学受験特化型チャットセッション
+export const startEnhancedChatSession = async (
+  topic: string, 
+  subject: string, 
+  learnerProfile?: LearnerProfile
+): Promise<ChatSession> => {
+  if (!genAI) {
+    throw new Error(`APIキーエラー: ${apiKeyMessage}`);
+  }
+  
+  try {
+    const enhancedPrompt = generateEnhancedAIPrompt(topic, subject, learnerProfile);
+    
+    const generativeModel = genAI.getGenerativeModel({ 
+      model: model,
+      systemInstruction: enhancedPrompt
+    });
+    
+    const chat = generativeModel.startChat({
+      history: []
+    });
+    
+    console.log('✅ 中学受験特化チャットセッション開始成功', { topic, subject, grade: learnerProfile?.currentGrade });
+    return chat;
+  } catch (error) {
+    console.error('❌ 中学受験特化チャットセッション開始エラー:', error);
+    throw new Error(`中学受験特化チャットセッションの開始に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
   }
 };
 

@@ -1,6 +1,7 @@
 
 import { Subject } from './types';
 import { ALL_COMPREHENSIVE_SUBJECTS } from './data/allSubjectsComprehensive';
+import { educationSystem, LearnerProfile } from './services/enhancedEducationSystem';
 
 // 互換性のための変換関数
 const convertExtendedToBasic = (extendedSubjects: any[]): Subject[] => {
@@ -235,6 +236,7 @@ export const BASIC_SUBJECTS_DATA: Subject[] = [
   },
 ];
 
+// 基本的なAIプロンプト（後方互換性用）
 export const AI_SYSTEM_PROMPT = `あなたは日本の中学受験を目指す小学生向けのAI学習アシスタント「みらいコーチ」です。
 これから生徒と「セルフトークラーニング」という対話形式で学習を進めます。
 
@@ -250,3 +252,55 @@ export const AI_SYSTEM_PROMPT = `あなたは日本の中学受験を目指す�
 7. 回答は簡潔に、しかしポイントを抑えて伝えてください。長文になりすぎないように注意してください。各メッセージは2～4文程度が目安です。
 8. 生徒の応答が短い場合や、もっと説明が必要な場合は、優しく促してください。例：「もう少し詳しく教えてくれるかな？」「どうしてそう思ったのか、理由も聞かせてほしいな。」
 `;
+
+// 中学受験特化型のプロンプト生成関数
+export const generateEnhancedAIPrompt = (topic: string, subject: string, learnerProfile?: LearnerProfile): string => {
+  // デフォルトの学習者プロフィール（types.ts のLearnerProfileに準拠）
+  const defaultProfile: LearnerProfile = {
+    id: 'default',
+    name: '学習者',
+    currentGrade: '5th',
+    targetGrade: '6th',
+    targetSchools: [],
+    schoolLevel: 'standard',
+    studyStartDate: new Date(),
+    availableStudyHours: {
+      weekday: 2,
+      weekend: 4
+    },
+    subjectLevels: {
+      [subject]: {
+        currentLevel: 5,
+        targetLevel: 8,
+        strengths: [],
+        weaknesses: []
+      }
+    },
+    learningPreferences: {
+      preferredDifficulty: 'gradual',
+      learningStyle: 'visual',
+      sessionLength: 'medium',
+      motivationType: 'achievement'
+    },
+    schedule: {
+      schoolSchedule: {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: [],
+        saturday: [],
+        sunday: []
+      },
+      studyTimeSlots: [],
+      busyPeriods: []
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  const profile = learnerProfile || defaultProfile;
+  
+  // 拡張教育システムからプロンプトを生成
+  return educationSystem.generateAIPrompt(topic, subject, profile);
+};
