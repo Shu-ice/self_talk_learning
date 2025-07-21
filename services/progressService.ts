@@ -50,39 +50,142 @@ export const saveUserProgress = (progress: UserProgress): void => {
 export const createInitialUserProgress = (): UserProgress => {
   return {
     userId: DEFAULT_USER_ID,
-    subjectProgresses: [],
+    
+    subjectProgress: {
+      math: {
+        completedTopics: [],
+        currentTopic: null,
+        masteryLevel: 0,
+        timeSpent: 0,
+        lastStudied: new Date(),
+        streakDays: 0,
+        achievements: []
+      },
+      japanese: {
+        completedTopics: [],
+        currentTopic: null,
+        masteryLevel: 0,
+        timeSpent: 0,
+        lastStudied: new Date(),
+        streakDays: 0,
+        achievements: []
+      },
+      science: {
+        completedTopics: [],
+        currentTopic: null,
+        masteryLevel: 0,
+        timeSpent: 0,
+        lastStudied: new Date(),
+        streakDays: 0,
+        achievements: []
+      },
+      social: {
+        completedTopics: [],
+        currentTopic: null,
+        masteryLevel: 0,
+        timeSpent: 0,
+        lastStudied: new Date(),
+        streakDays: 0,
+        achievements: []
+      }
+    },
+    
+    overallStats: {
+      totalStudyTime: 0,
+      totalSessions: 0,
+      averageSessionLength: 0,
+      consistencyScore: 0,
+      motivationLevel: 0.5,
+      lastActiveDate: new Date()
+    },
+    
+    adaptiveMetrics: {
+      learningVelocity: 0,
+      retentionRate: 0,
+      difficultyPreference: 5,
+      optimalSessionLength: 30,
+      bestStudyTimes: ['19:00']
+    },
+    
     learningStats: {
-      totalStudyDays: 0,
       currentStreak: 0,
-      longestStreak: 0,
       totalSessions: 0,
       totalStudyTime: 0,
       overallCorrectRate: 0,
-      dailyStudyTime: [],
-      weeklyProgress: []
+      dailyStudyTime: []
     },
+    
+    subjectProgresses: [
+      {
+        subjectId: 'math',
+        overallMasteryScore: 0,
+        totalSessions: 0,
+        totalStudyTime: 0,
+        lastStudiedAt: new Date().toISOString(),
+        topicProgresses: []
+      },
+      {
+        subjectId: 'japanese',
+        overallMasteryScore: 0,
+        totalSessions: 0,
+        totalStudyTime: 0,
+        lastStudiedAt: new Date().toISOString(),
+        topicProgresses: []
+      },
+      {
+        subjectId: 'science',
+        overallMasteryScore: 0,
+        totalSessions: 0,
+        totalStudyTime: 0,
+        lastStudiedAt: new Date().toISOString(),
+        topicProgresses: []
+      },
+      {
+        subjectId: 'social',
+        overallMasteryScore: 0,
+        totalSessions: 0,
+        totalStudyTime: 0,
+        lastStudiedAt: new Date().toISOString(),
+        topicProgresses: []
+      }
+    ],
+    
     achievements: [],
+    
     preferences: {
-      preferredDifficulty: 3,
-      studyTimeGoal: 20,
-      enableNotifications: true
-    },
-    lastUpdated: new Date()
+      studyTimeGoal: 20
+    }
   };
 };
 
 // 学習セッション開始時の記録
 export const startLearningSession = (subjectId: string, topicId: string): LearningSession => {
   const session: LearningSession = {
-    id: crypto.randomUUID(),
+    sessionId: crypto.randomUUID(),
+    userId: DEFAULT_USER_ID,
     subjectId,
     topicId,
     startTime: new Date(),
+    messagesCount: 0,
+    difficultyLevel: 3, // デフォルト中級
+    completionStatus: 'paused',
+    learningOutcomes: [],
+    performanceMetrics: {
+      responseTime: 0,
+      accuracy: 0,
+      engagement: 0.5,
+      comprehension: 0.5
+    },
+    adaptiveAdjustments: {
+      difficultyChanged: false,
+      focusShifted: false,
+      timeAdjusted: false,
+      supportAdded: false
+    },
     totalMessages: 0,
     correctAnswers: 0,
     incorrectAnswers: 0,
-    totalStudyTime: 0,
-    difficultyLevel: 3 // デフォルト中級
+    totalStudyTime: 0
   };
   
   return session;
@@ -92,7 +195,9 @@ export const startLearningSession = (subjectId: string, topicId: string): Learni
 export const endLearningSession = (session: LearningSession): LearningSession => {
   if (!session.endTime) {
     session.endTime = new Date();
-    session.totalStudyTime = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / 1000);
+    session.duration = Math.floor((session.endTime.getTime() - session.startTime.getTime()) / 1000);
+    session.totalStudyTime = session.duration;
+    session.completionStatus = 'completed';
   }
   return session;
 };
@@ -102,11 +207,14 @@ export const updateSessionStats = (
   session: LearningSession, 
   isCorrect?: boolean
 ): LearningSession => {
-  session.totalMessages++;
+  // 安全なデフォルト値を設定
+  session.totalMessages = (session.totalMessages || 0) + 1;
+  session.messagesCount = session.totalMessages;
+  
   if (isCorrect === true) {
-    session.correctAnswers++;
+    session.correctAnswers = (session.correctAnswers || 0) + 1;
   } else if (isCorrect === false) {
-    session.incorrectAnswers++;
+    session.incorrectAnswers = (session.incorrectAnswers || 0) + 1;
   }
   return session;
 };
@@ -168,14 +276,15 @@ export const updateProgressAfterSession = (session: LearningSession): void => {
   const subjectProgress = getOrCreateSubjectProgress(userProgress, session.subjectId);
   const topicProgress = getOrCreateTopicProgress(subjectProgress, session.topicId);
   
-  // セッション統計更新
-  const correctRate = session.totalMessages > 0 
-    ? session.correctAnswers / (session.correctAnswers + session.incorrectAnswers) || 0 
+  // セッション統計更新（安全な計算）
+  const totalAnswers = (session.correctAnswers || 0) + (session.incorrectAnswers || 0);
+  const correctRate = totalAnswers > 0 
+    ? (session.correctAnswers || 0) / totalAnswers 
     : 0;
   
   // 単元進捗更新
   topicProgress.totalSessions++;
-  topicProgress.totalStudyTime += session.totalStudyTime;
+  topicProgress.totalStudyTime += (session.totalStudyTime || session.duration || 0);
   topicProgress.averageCorrectRate = calculateNewAverage(
     topicProgress.averageCorrectRate,
     correctRate,

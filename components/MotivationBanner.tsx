@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LearningStats, Achievement } from '../types';
 
 interface MotivationBannerProps {
-  learningStats: LearningStats;
+  learningStats?: LearningStats;
   newAchievements?: Achievement[];
   onClose?: () => void;
 }
@@ -26,7 +26,11 @@ const MotivationBanner: React.FC<MotivationBannerProps> = ({
   }, [newAchievements, learningStats]);
 
   const generateMotivationMessage = () => {
-    const { currentStreak, totalSessions, overallCorrectRate } = learningStats;
+    const { 
+      currentStreak = 0, 
+      totalSessions = 0, 
+      overallCorrectRate = 0 
+    } = learningStats || {};
     
     if (currentStreak >= 7) {
       setMotivationMessage(`🔥 素晴らしい！${currentStreak}日連続学習を達成！この調子で頑張ろう！`);
@@ -68,8 +72,8 @@ const MotivationBanner: React.FC<MotivationBannerProps> = ({
             <div className="space-y-2">
               {newAchievements.map(achievement => (
                 <div key={achievement.id} className="flex items-center justify-center space-x-2">
-                  <span className="text-2xl">{achievement.icon}</span>
-                  <span className="font-semibold">{achievement.title}</span>
+                  <span className="text-2xl">{achievement.icon || '🏆'}</span>
+                  <span className="font-semibold">{achievement.title || achievement.name}</span>
                 </div>
               ))}
             </div>
@@ -87,20 +91,20 @@ const MotivationBanner: React.FC<MotivationBannerProps> = ({
       )}
 
       {/* ストリーク表示 */}
-      {learningStats.currentStreak > 0 && (
-        <div className={`bg-gradient-to-r ${getStreakColor(learningStats.currentStreak)} rounded-xl p-4 text-white shadow-lg`}>
+      {(learningStats?.currentStreak || 0) > 0 && (
+        <div className={`bg-gradient-to-r ${getStreakColor(learningStats?.currentStreak || 0)} rounded-xl p-4 text-white shadow-lg`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="text-3xl">{getStreakIcon(learningStats.currentStreak)}</div>
+              <div className="text-3xl">{getStreakIcon(learningStats?.currentStreak || 0)}</div>
               <div>
-                <div className="text-xl font-bold">{learningStats.currentStreak}日連続学習中！</div>
+                <div className="text-xl font-bold">{learningStats?.currentStreak || 0}日連続学習中！</div>
                 <div className="text-sm opacity-90">
-                  最長記録: {learningStats.longestStreak}日
+                  最長記録: {(learningStats as any)?.longestStreak || 0}日
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">{learningStats.currentStreak}</div>
+              <div className="text-2xl font-bold">{learningStats?.currentStreak || 0}</div>
               <div className="text-xs opacity-75">STREAK</div>
             </div>
           </div>
@@ -122,12 +126,12 @@ const MotivationBanner: React.FC<MotivationBannerProps> = ({
 };
 
 interface TodayGoalProgressProps {
-  learningStats: LearningStats;
+  learningStats?: LearningStats;
 }
 
 const TodayGoalProgress: React.FC<TodayGoalProgressProps> = ({ learningStats }) => {
   const today = new Date().toISOString().split('T')[0];
-  const todayStudyTime = learningStats.dailyStudyTime.find(d => d.date === today)?.studyTime || 0;
+  const todayStudyTime = learningStats?.dailyStudyTime?.find(d => d.date === today)?.studyTime || 0;
   const goalTime = 20 * 60; // 20分を秒に変換
   const progressPercentage = Math.min((todayStudyTime / goalTime) * 100, 100);
   

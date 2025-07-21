@@ -4,7 +4,7 @@ import { SUBJECTS_DATA } from '../constants';
 import MotivationBanner from './MotivationBanner';
 
 interface LearningDashboardProps {
-  userProgress: UserProgress;
+  userProgress: UserProgress | null;
   onSubjectSelect: (subjectId: string) => void;
 }
 
@@ -12,7 +12,30 @@ const LearningDashboard: React.FC<LearningDashboardProps> = ({
   userProgress, 
   onSubjectSelect 
 }) => {
-  const { learningStats, subjectProgresses, achievements } = userProgress;
+  // userProgressがnullの場合は読み込み中を表示
+  if (!userProgress) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="text-2xl text-gray-500">📊</div>
+          <p className="text-gray-600 mt-2">学習データを読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 安全なデフォルト値を設定
+  const learningStats = userProgress.learningStats || {
+    currentStreak: 0,
+    totalSessions: 0,
+    totalStudyTime: 0,
+    overallCorrectRate: 0,
+    dailyStudyTime: []
+  };
+  
+  const subjectProgresses = userProgress.subjectProgresses || [];
+  const achievements = userProgress.achievements || [];
+  const preferences = userProgress.preferences || { studyTimeGoal: 30 };
 
   // 時間を分:秒形式に変換
   const formatTime = (seconds: number): string => {
@@ -122,12 +145,12 @@ const LearningDashboard: React.FC<LearningDashboardProps> = ({
                 key={achievement.id}
                 className="flex items-center space-x-3 p-3 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200"
               >
-                <div className="text-2xl">{achievement.icon}</div>
+                <div className="text-2xl">{achievement.icon || '🏆'}</div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-slate-800">{achievement.title}</h4>
+                  <h4 className="font-semibold text-slate-800">{achievement.title || achievement.name}</h4>
                   <p className="text-sm text-slate-600">{achievement.description}</p>
                   <p className="text-xs text-slate-500 mt-1">
-                    {new Date(achievement.unlockedAt).toLocaleDateString()}
+                    {new Date(achievement.unlockedAt || achievement.earnedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -167,7 +190,7 @@ const LearningDashboard: React.FC<LearningDashboardProps> = ({
         <h2 className="text-xl font-bold mb-3">今日の学習目標</h2>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sky-100">目標時間: {userProgress.preferences.studyTimeGoal}分</p>
+            <p className="text-sky-100">目標時間: {preferences.studyTimeGoal}分</p>
             <p className="text-sky-100">
               今日の学習: {Math.round((learningStats.dailyStudyTime.find(d => 
                 d.date === new Date().toISOString().split('T')[0]

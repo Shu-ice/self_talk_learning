@@ -210,7 +210,7 @@ const SubjectSelector: React.FC<SubjectSelectorProps> = ({ onStartLearning, disa
         />
       )}
 
-      {/* 最難関中学受験対応ドロップダウン選択モード */}
+      {/* 最難関中学受験対応 - 修正版コンポーネント */}
       {showFavorites && !showProgress && showDropdownMode && showEliteMode && (
         <EliteSchoolExamDropdown
           onStartLearning={onStartLearning}

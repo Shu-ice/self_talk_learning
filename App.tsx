@@ -328,6 +328,10 @@ ${adaptiveLearning.promptModifier}`;
       const updatedProgress = loadUserProgress();
       if (updatedProgress) {
         setUserProgress(updatedProgress);
+      } else {
+        // フォールバック: 基本の進捗データを作成
+        const fallbackProgress = createInitialUserProgress();
+        setUserProgress(fallbackProgress);
       }
     }
 
@@ -345,8 +349,8 @@ ${adaptiveLearning.promptModifier}`;
       // プロフィールベースの進捗更新
       if (learnerProfile && currentLearningSession && currentTopic) {
         const sessionData = {
-          timeSpent: currentLearningSession.duration || 0,
-          comprehensionLevel: realTimeAnalysis?.comprehensionAnalysis.conceptualUnderstanding || 0.5,
+          timeSpent: currentLearningSession.duration || currentLearningSession.totalStudyTime || 0,
+          comprehensionLevel: realTimeAnalysis?.comprehensionAnalysis?.conceptualUnderstanding || 0.5,
           topicId: currentTopic.id,
           completed: currentLearningSession.completionStatus === 'completed'
         };

@@ -26,7 +26,11 @@
       "Bash(npx ts-node:*)",
       "Bash(kill:*)",
       "Bash(timeout:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

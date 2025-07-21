@@ -42,8 +42,8 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
         return (
           subject?.name.includes(searchTerm) ||
           topic?.name.includes(searchTerm) ||
-          recording.summary.strengths.some(s => s.includes(searchTerm)) ||
-          recording.summary.challenges.some(c => c.includes(searchTerm))
+          recording.summary?.strengths?.some(s => s.includes(searchTerm)) ||
+          recording.summary?.challenges?.some(c => c.includes(searchTerm))
         );
       });
     }
@@ -52,11 +52,13 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return b.startTime.getTime() - a.startTime.getTime();
+          const dateA = a.startTime instanceof Date ? a.startTime : new Date(a.startTime);
+          const dateB = b.startTime instanceof Date ? b.startTime : new Date(b.startTime);
+          return dateB.getTime() - dateA.getTime();
         case 'duration':
           return (b.duration || 0) - (a.duration || 0);
         case 'progress':
-          return b.summary.comprehensionProgression.end - a.summary.comprehensionProgression.end;
+          return (b.summary?.comprehensionProgression?.end || 0) - (a.summary?.comprehensionProgression?.end || 0);
         default:
           return 0;
       }
@@ -92,8 +94,9 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
 
   // エンゲージメントの平均計算
   const getAverageEngagement = (recording: RecordedSession): number => {
-    const levels = recording.summary.engagementLevels;
-    return levels.high * 1 + levels.medium * 0.6 + levels.low * 0.2;
+    const levels = recording.summary?.engagementLevels;
+    if (!levels) return 0;
+    return (levels.high || 0) * 1 + (levels.medium || 0) * 0.6 + (levels.low || 0) * 0.2;
   };
 
   const filteredRecordings = getFilteredAndSortedRecordings();
@@ -203,7 +206,10 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
                             {subject?.name} - {topic?.name}
                           </h3>
                           <p className="text-sm text-gray-600 mt-1">
-                            {recording.startTime.toLocaleDateString()} {recording.startTime.toLocaleTimeString()}
+                            {(() => {
+                              const date = recording.startTime instanceof Date ? recording.startTime : new Date(recording.startTime);
+                              return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                            })()}
                           </p>
                         </div>
                         <button
@@ -228,12 +234,12 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
                         </div>
                         <div>
                           <div className="text-xs text-gray-500">メッセージ</div>
-                          <div className="font-medium">{recording.summary.totalMessages}件</div>
+                          <div className="font-medium">{recording.summary?.totalMessages || 0}件</div>
                         </div>
                         <div>
                           <div className="text-xs text-gray-500">問題解決</div>
                           <div className="font-medium">
-                            {recording.summary.problemsSolved}/{recording.summary.totalProblems}
+                            {recording.summary?.problemsSolved || 0}/{recording.summary?.totalProblems || 0}
                           </div>
                         </div>
                         <div>
@@ -253,58 +259,58 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
                         <div className="flex justify-between text-xs text-gray-500 mb-1">
                           <span>理解度の変化</span>
                           <span>
-                            {Math.round(recording.summary.comprehensionProgression.start * 100)}% → {Math.round(recording.summary.comprehensionProgression.end * 100)}%
+                            {Math.round((recording.summary?.comprehensionProgression?.start || 0) * 100)}% → {Math.round((recording.summary?.comprehensionProgression?.end || 0) * 100)}%
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-300 ${
-                              recording.summary.comprehensionProgression.end > recording.summary.comprehensionProgression.start
+                              (recording.summary?.comprehensionProgression?.end || 0) > (recording.summary?.comprehensionProgression?.start || 0)
                                 ? 'bg-green-500' : 'bg-blue-500'
                             }`}
-                            style={{ width: `${recording.summary.comprehensionProgression.end * 100}%` }}
+                            style={{ width: `${(recording.summary?.comprehensionProgression?.end || 0) * 100}%` }}
                           ></div>
                         </div>
                       </div>
 
                       {/* 強みと課題 */}
                       <div>
-                        {recording.summary.strengths.length > 0 && (
+                        {(recording.summary?.strengths?.length || 0) > 0 && (
                           <div className="mb-2">
                             <div className="text-xs text-gray-500 mb-1">強み</div>
                             <div className="flex flex-wrap gap-1">
-                              {recording.summary.strengths.slice(0, 2).map((strength, index) => (
+                              {recording.summary?.strengths?.slice(0, 2).map((strength, index) => (
                                 <span
                                   key={index}
                                   className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded"
                                 >
                                   {strength}
                                 </span>
-                              ))}
-                              {recording.summary.strengths.length > 2 && (
+                              )) || []}
+                              {(recording.summary?.strengths?.length || 0) > 2 && (
                                 <span className="text-xs text-gray-500">
-                                  +{recording.summary.strengths.length - 2}個
+                                  +{(recording.summary?.strengths?.length || 0) - 2}個
                                 </span>
                               )}
                             </div>
                           </div>
                         )}
 
-                        {recording.summary.challenges.length > 0 && (
+                        {(recording.summary?.challenges?.length || 0) > 0 && (
                           <div>
                             <div className="text-xs text-gray-500 mb-1">課題</div>
                             <div className="flex flex-wrap gap-1">
-                              {recording.summary.challenges.slice(0, 2).map((challenge, index) => (
+                              {recording.summary?.challenges?.slice(0, 2).map((challenge, index) => (
                                 <span
                                   key={index}
                                   className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded"
                                 >
                                   {challenge}
                                 </span>
-                              ))}
-                              {recording.summary.challenges.length > 2 && (
+                              )) || []}
+                              {(recording.summary?.challenges?.length || 0) > 2 && (
                                 <span className="text-xs text-gray-500">
-                                  +{recording.summary.challenges.length - 2}個
+                                  +{(recording.summary?.challenges?.length || 0) - 2}個
                                 </span>
                               )}
                             </div>
@@ -314,21 +320,21 @@ const SessionRecordings: React.FC<SessionRecordingsProps> = ({ onClose }) => {
                     </div>
 
                     {/* 重要な瞬間の数 */}
-                    {recording.keyMoments.length > 0 && (
+                    {(recording.keyMoments?.length || 0) > 0 && (
                       <div className="px-4 pb-4">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-gray-500">重要な瞬間</span>
                           <div className="flex items-center space-x-1">
-                            {recording.keyMoments.filter(m => m.type === 'breakthrough').length > 0 && (
+                            {(recording.keyMoments?.filter(m => m.type === 'breakthrough')?.length || 0) > 0 && (
                               <span className="flex items-center space-x-1">
                                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span>{recording.keyMoments.filter(m => m.type === 'breakthrough').length}</span>
+                                <span>{recording.keyMoments?.filter(m => m.type === 'breakthrough')?.length || 0}</span>
                               </span>
                             )}
-                            {recording.keyMoments.filter(m => m.type === 'struggle').length > 0 && (
+                            {(recording.keyMoments?.filter(m => m.type === 'struggle')?.length || 0) > 0 && (
                               <span className="flex items-center space-x-1">
                                 <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                                <span>{recording.keyMoments.filter(m => m.type === 'struggle').length}</span>
+                                <span>{recording.keyMoments?.filter(m => m.type === 'struggle')?.length || 0}</span>
                               </span>
                             )}
                           </div>
